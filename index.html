@@ -1,4 +1,1321 @@
-    <!-- Cash Counter Modal -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Calculator Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px 20px;
+            animation: slideIn 0.8s ease-out;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 10px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            color: white;
+            font-family: inherit;
+            font-size: 16px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .theme-icon {
+            font-size: 18px;
+        }
+
+        /* Light Mode Styles */
+        body.light-mode {
+            background: linear-gradient(-45deg, #e0e7ff, #dbeafe, #ede9fe, #e0f2fe);
+            color: #333;
+        }
+
+        body.light-mode::before {
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+        }
+
+        body.light-mode .calc-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        body.light-mode .calc-card p {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        body.light-mode .section-title {
+            color: #333;
+        }
+
+        body.light-mode .calc-card h3 {
+            color: #333;
+        }
+
+        body.light-mode header p {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        body.light-mode .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .modal-content h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.light-mode .close-btn {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        body.light-mode .close-btn:hover {
+            color: #000;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .input-group label {
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        body.light-mode .input-group input,
+        body.light-mode .input-group select {
+            background: rgba(0, 0, 0, 0.05);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        body.light-mode .input-group input::placeholder {
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        body.light-mode .input-group input:focus,
+        body.light-mode .input-group select:focus {
+            border-color: #667eea;
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-mode .result-box {
+            background: rgba(0, 0, 0, 0.05);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+        }
+
+        body.light-mode .result-box h4 {
+            color: #667eea;
+        }
+
+        body.light-mode .result-item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .result-item:last-child {
+            border-bottom: none;
+        }
+
+        body.light-mode .result-label {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        body.light-mode .result-value {
+            color: #333;
+        }
+
+        body.light-mode .loan-section {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        body.light-mode table th,
+        body.light-mode table td {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .highlight-box {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
+            color: #333;
+        }
+
+        body.light-mode .note-box {
+            background: rgba(255, 193, 7, 0.1);
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        body.light-mode .theme-toggle {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        body.light-mode .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: -2px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .calc-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.6s ease-out backwards;
+        }
+
+        .calc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .calc-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3), 0 0 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .calc-card:hover::before {
+            opacity: 1;
+        }
+
+        .calc-card h3 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+        }
+
+        .calc-card p {
+            color: rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 1;
+            line-height: 1.6;
+        }
+
+        .icon-wrapper {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s;
+        }
+
+        .calc-card:hover .icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
+        }
+
+        .section-title {
+            color: #fff;
+            font-size: 2em;
+            margin: 60px 0 30px 0;
+            padding-left: 20px;
+            border-left: 4px solid;
+            border-image: linear-gradient(to bottom, #667eea, #764ba2) 1;
+            font-weight: 700;
+            letter-spacing: -1px;
+            position: relative;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            max-width: 900px;
+            margin: 20px auto;
+            border-radius: 25px;
+            padding: 40px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2em;
+            margin-bottom: 30px;
+            font-weight: 800;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 32px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6);
+            background: none;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 35px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .result-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-box h4 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1em;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .loan-section {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+        }
+
+        .highlight-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
+            border-left: 4px solid #4caf50;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .note-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* SVG Icons */
+        .icon-svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        @media (max-width: 768px) {
+            .two-col, .grid-two {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FINANCIAL CALCULATOR HUB</h1>
+            <p>Advanced Financial Intelligence & Analysis Platform</p>
+            <button id="theme-toggle" class="theme-toggle">
+                <span class="theme-icon">🌙</span>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+        </header>
+
+        <h2 class="section-title">EMI CALCULATORS</h2>
+        <div class="calc-grid">
+            <div class="calc-card" onclick="openModal('emiCalc')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    </div>
+                    EMI Calculator
+                </h3>
+                <p>Calculate your monthly loan EMI with precision and detailed breakdown</p>
+            </div>
+            <div class="calc-card" onclick="openModal('quickCalc')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+                    </div>
+                    Quick Calculator
+                </h3>
+                <p>Lightning-fast EMI calculation with simplified inputs</p>
+            </div>
+            <div class="calc-card" onclick="openModal('advanceEmi')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                    </div>
+                    Advanced EMI
+                </h3>
+                <p>Comprehensive EMI analysis with prepayment optimization</p>
+            </div>
+            <div class="calc-card" onclick="openModal('compareLoans')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                    </div>
+                    Compare Loans
+                </h3>
+                <p>Intelligent comparison of multiple loan options</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">SCENARIO & GOAL-BASED CALCULATORS</h2>
+        <div class="calc-grid">
+            <div class="calc-card" onclick="openModal('retirementCalc')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    Retirement Planner
+                </h3>
+                <p>Plan your retirement with inflation-adjusted calculations</p>
+            </div>
+            <div class="calc-card" onclick="openModal('prepaySimulator')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    </div>
+                    Loan Prepayment Simulator
+                </h3>
+                <p>See how much you save with prepayments</p>
+            </div>
+            <div class="calc-card" onclick="openModal('taxOptimizer')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    </div>
+                    Income Tax Optimizer
+                </h3>
+                <p>Calculate tax and optimize with Section 80C deductions</p>
+            </div>
+            <div class="calc-card" onclick="openModal('netWorthTracker')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                    </div>
+                    Net Worth Tracker
+                </h3>
+                <p>Track your assets vs liabilities for financial wellness</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">BANKING CALCULATORS</h2>
+        <div class="calc-grid">
+            <div class="calc-card" onclick="openModal('fdCalc')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z"/></svg>
+                    </div>
+                    FD Calculator
+                </h3>
+                <p>Compute Fixed Deposit returns with compound interest</p>
+            </div>
+            <div class="calc-card" onclick="openModal('rdCalc')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    </div>
+                    RD Calculator
+                </h3>
+                <p>Calculate Recurring Deposit maturity amounts</p>
+            </div>
+            <div class="calc-card" onclick="openModal('fdRdComparator')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+                    </div>
+                    FD/RD Rate Comparator
+                </h3>
+                <p>Compare rates from multiple banks</p>
+            </div>
+            <div class="calc-card" onclick="openModal('sipLumpsum')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+                    </div>
+                    SIP vs Lump Sum
+                </h3>
+                <p>Compare systematic vs one-time investment returns</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">GST & TAX CALCULATORS</h2>
+        <div class="calc-grid">
+            <div class="calc-card" onclick="openModal('gstCalc')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-1.5c0-2.33 4.67-3.5 7-3.5s7 1.17 7 3.5V19z"/></svg>
+                    </div>
+                    GST Calculator
+                </h3>
+                <p>Calculate GST with CGST/SGST breakdown</p>
+            </div>
+            <div class="calc-card" onclick="openModal('reverseGst')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+                    </div>
+                    Reverse GST Calculator
+                </h3>
+                <p>Extract base price from GST-inclusive amount</p>
+            </div>
+            <div class="calc-card" onclick="openModal('aprCalculator')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    </div>
+                    Effective Interest Rate (APR)
+                </h3>
+                <p>Calculate true annual percentage rate with all fees</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">BUSINESS & UTILITY CALCULATORS</h2>
+        <div class="calc-grid">
+            <div class="calc-card" onclick="openModal('rentVsBuy')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    </div>
+                    Rent vs Buy Analyzer
+                </h3>
+                <p>Compare long-term costs of renting vs buying property</p>
+            </div>
+            <div class="calc-card" onclick="openModal('walletFeeCalc')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                    </div>
+                    Digital Wallet Fee Calculator
+                </h3>
+                <p>Compare transaction fees across payment platforms</p>
+            </div>
+            <div class="calc-card" onclick="openModal('cashCounter')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    </div>
+                    Cash Note Counter
+                </h3>
+                <p>Count and organize cash across all denominations</p>
+            </div>
+            <div class="calc-card" onclick="openModal('amountToWord')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    </div>
+                    Amount to Words
+                </h3>
+                <p>Convert numerical amounts to word format</p>
+            </div>
+            <div class="calc-card" onclick="openModal('currencyConv')">
+                <h3>
+                    <div class="icon-wrapper">
+                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12.89 11.1c-1.78-.59-2.64-.96-2.64-1.9 0-1.02 1.11-1.39 1.81-1.39 1.31 0 1.79.99 1.9 1.34l1.58-.67c-.15-.45-.82-1.92-2.54-2.24V5h-2v1.26c-2.48.56-2.49 2.86-2.49 2.96 0 2.27 2.25 2.91 3.35 3.31 1.58.56 2.28 1.07 2.28 2.03 0 1.13-1.05 1.61-1.98 1.61-1.82 0-2.34-1.87-2.4-2.09l-1.66.67c.63 2.19 2.28 2.78 2.9 2.96V19h2v-1.24c.4-.09 2.9-.59 2.9-3.22 0-1.39-.61-2.61-3.01-3.44zM3 21H1v-6h6v2l-2.48-.01c1.61 2.41 4.36 4.01 7.48 4.01 2.84 0 5.46-1.31 7.16-3.39l1.63 1.17c-2.02 2.48-5.09 3.98-8.79 3.98-4.39 0-8.22-2.55-10-6.3L3 18v3z"/></svg>
+                    </div>
+                    Currency Conversion
+                </h3>
+                <p>Real-time currency exchange calculations</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="emiCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('emiCalc')">×</button>
+            <h2>EMI Calculator</h2>
+            <div class="input-group">
+                <label>Loan Amount (₹)</label>
+                <input type="number" id="emiLoan" placeholder="Enter loan amount">
+            </div>
+            <div class="input-group">
+                <label>Interest Rate (% per annum)</label>
+                <input type="number" id="emiRate" step="0.1" placeholder="Enter interest rate">
+            </div>
+            <div class="input-group">
+                <label>Loan Tenure (months)</label>
+                <input type="number" id="emiTenure" placeholder="Enter tenure in months">
+            </div>
+            <button class="btn" onclick="calculateEMI()">Calculate EMI</button>
+            <div id="emiResult"></div>
+        </div>
+    </div>
+
+    <div id="quickCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('quickCalc')">×</button>
+            <h2>Quick Calculator</h2>
+            <div class="input-group">
+                <label>Loan Amount (₹)</label>
+                <input type="number" id="quickLoan" placeholder="500000">
+            </div>
+            <div class="input-group">
+                <label>Interest Rate (%)</label>
+                <input type="number" id="quickRate" step="0.1" placeholder="10.5">
+            </div>
+            <div class="input-group">
+                <label>Tenure (Years)</label>
+                <input type="number" id="quickYears" placeholder="5">
+            </div>
+            <button class="btn" onclick="calculateQuick()">Calculate</button>
+            <div id="quickResult"></div>
+        </div>
+    </div>
+
+    <div id="advanceEmi" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('advanceEmi')">×</button>
+            <h2>Advanced EMI Calculator</h2>
+            <div class="input-group">
+                <label>Loan Amount (₹)</label>
+                <input type="number" id="advLoan" placeholder="Enter loan amount">
+            </div>
+            <div class="input-group">
+                <label>Interest Rate (% per annum)</label>
+                <input type="number" id="advRate" step="0.1" placeholder="Enter interest rate">
+            </div>
+            <div class="input-group">
+                <label>Loan Tenure (months)</label>
+                <input type="number" id="advTenure" placeholder="Enter tenure">
+            </div>
+            <div class="input-group">
+                <label>Prepayment Amount (₹) - Optional</label>
+                <input type="number" id="advPrepay" placeholder="Enter prepayment amount">
+            </div>
+            <div class="input-group">
+                <label>Prepayment After (months) - Optional</label>
+                <input type="number" id="advPrepayMonth" placeholder="After how many months?">
+            </div>
+            <button class="btn" onclick="calculateAdvanced()">Calculate</button>
+            <div id="advResult"></div>
+        </div>
+    </div>
+
+    <div id="compareLoans" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('compareLoans')">×</button>
+            <h2>Compare Loans</h2>
+            <div class="grid-two">
+                <div class="loan-section">
+                    <h3>Loan Option 1</h3>
+                    <div class="input-group">
+                        <label>Loan Amount (₹)</label>
+                        <input type="number" id="cmp1Loan" placeholder="1000000">
+                    </div>
+                    <div class="input-group">
+                        <label>Interest Rate (%)</label>
+                        <input type="number" id="cmp1Rate" step="0.1" placeholder="9.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Tenure (months)</label>
+                        <input type="number" id="cmp1Tenure" placeholder="60">
+                    </div>
+                </div>
+                <div class="loan-section">
+                    <h3>Loan Option 2</h3>
+                    <div class="input-group">
+                        <label>Loan Amount (₹)</label>
+                        <input type="number" id="cmp2Loan" placeholder="1000000">
+                    </div>
+                    <div class="input-group">
+                        <label>Interest Rate (%)</label>
+                        <input type="number" id="cmp2Rate" step="0.1" placeholder="10.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Tenure (months)</label>
+                        <input type="number" id="cmp2Tenure" placeholder="60">
+                    </div>
+                </div>
+            </div>
+            <button class="btn" onclick="compareLoans()">Compare</button>
+            <div id="compareResult"></div>
+        </div>
+    </div>
+
+    <div id="retirementCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('retirementCalc')">×</button>
+            <h2>Retirement Planner</h2>
+            <div class="input-group">
+                <label>Current Age</label>
+                <input type="number" id="currentAge" placeholder="30">
+            </div>
+            <div class="input-group">
+                <label>Desired Retirement Age</label>
+                <input type="number" id="retirementAge" placeholder="60">
+            </div>
+            <div class="input-group">
+                <label>Life Expectancy</label>
+                <input type="number" id="lifeExpectancy" placeholder="85">
+            </div>
+            <div class="input-group">
+                <label>Current Monthly Expenses (₹)</label>
+                <input type="number" id="monthlyExpenses" placeholder="50000">
+            </div>
+            <div class="input-group">
+                <label>Current Savings (₹)</label>
+                <input type="number" id="currentSavings" placeholder="500000">
+            </div>
+            <div class="input-group">
+                <label>Expected Inflation Rate (%)</label>
+                <input type="number" id="inflationRate" step="0.1" placeholder="6" value="6">
+            </div>
+            <div class="input-group">
+                <label>Expected Return on Investment (%)</label>
+                <input type="number" id="returnRate" step="0.1" placeholder="12" value="12">
+            </div>
+            <button class="btn" onclick="calculateRetirement()">Calculate Retirement Plan</button>
+            <div id="retirementResult"></div>
+        </div>
+    </div>
+
+    <div id="prepaySimulator" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('prepaySimulator')">×</button>
+            <h2>Loan Prepayment Simulator</h2>
+            <div class="input-group">
+                <label>Loan Amount (₹)</label>
+                <input type="number" id="prepayLoan" placeholder="2000000">
+            </div>
+            <div class="input-group">
+                <label>Interest Rate (% per annum)</label>
+                <input type="number" id="prepayRate" step="0.1" placeholder="9.5">
+            </div>
+            <div class="input-group">
+                <label>Loan Tenure (months)</label>
+                <input type="number" id="prepayTenure" placeholder="240">
+            </div>
+            <div class="input-group">
+                <label>Prepayment Amount (₹)</label>
+                <input type="number" id="prepayAmount" placeholder="100000">
+            </div>
+            <div class="input-group">
+                <label>Prepayment After (months)</label>
+                <input type="number" id="prepayAfter" placeholder="12">
+            </div>
+            <div class="input-group">
+                <label>Prepayment Type</label>
+                <select id="prepayType">
+                    <option value="reduce_tenure">Reduce Tenure</option>
+                    <option value="reduce_emi">Reduce EMI</option>
+                </select>
+            </div>
+            <button class="btn" onclick="calculatePrepayment()">Calculate Savings</button>
+            <div id="prepayResult"></div>
+        </div>
+    </div>
+
+    <div id="taxOptimizer" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('taxOptimizer')">×</button>
+            <h2>Income Tax Optimizer</h2>
+            <div class="input-group">
+                <label>Annual Income (₹)</label>
+                <input type="number" id="annualIncome" placeholder="1200000">
+            </div>
+            <div class="input-group">
+                <label>Tax Regime</label>
+                <select id="taxRegime">
+                    <option value="old">Old Tax Regime</option>
+                    <option value="new">New Tax Regime</option>
+                </select>
+            </div>
+            <div id="oldRegimeDeductions" style="display:block;">
+                <div class="input-group">
+                    <label>Section 80C Deductions (₹)</label>
+                    <input type="number" id="deduction80C" placeholder="150000" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Section 80D (Medical Insurance) (₹)</label>
+                    <input type="number" id="deduction80D" placeholder="25000" value="0">
+                </div>
+                <div class="input-group">
+                    <label>Home Loan Interest (₹)</label>
+                    <input type="number" id="homeLoanInterest" placeholder="200000" value="0">
+                </div>
+            </div>
+            <button class="btn" onclick="calculateTax()">Calculate Tax</button>
+            <div id="taxResult"></div>
+        </div>
+    </div>
+
+    <div id="netWorthTracker" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('netWorthTracker')">×</button>
+            <h2>Net Worth Tracker</h2>
+            <h3 style="color: #4caf50; margin-top: 20px;">Assets</h3>
+            <div class="input-group">
+                <label>Cash & Bank Balance (₹)</label>
+                <input type="number" id="cashBalance" placeholder="500000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Investments (Stocks, MFs, etc.) (₹)</label>
+                <input type="number" id="investments" placeholder="1000000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Real Estate Value (₹)</label>
+                <input type="number" id="realEstate" placeholder="5000000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Vehicles (₹)</label>
+                <input type="number" id="vehicles" placeholder="800000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Other Assets (₹)</label>
+                <input type="number" id="otherAssets" placeholder="200000" value="0">
+            </div>
+            
+            <h3 style="color: #f44336; margin-top: 30px;">Liabilities</h3>
+            <div class="input-group">
+                <label>Home Loan (₹)</label>
+                <input type="number" id="homeLoan" placeholder="3000000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Car Loan (₹)</label>
+                <input type="number" id="carLoan" placeholder="500000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Personal Loan (₹)</label>
+                <input type="number" id="personalLoan" placeholder="200000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Credit Card Debt (₹)</label>
+                <input type="number" id="creditCardDebt" placeholder="50000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Other Liabilities (₹)</label>
+                <input type="number" id="otherLiabilities" placeholder="0" value="0">
+            </div>
+            <button class="btn" onclick="calculateNetWorth()">Calculate Net Worth</button>
+            <div id="netWorthResult"></div>
+        </div>
+    </div>
+
+    <div id="fdCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('fdCalc')">×</button>
+            <h2>Fixed Deposit Calculator</h2>
+            <div class="input-group">
+                <label>Deposit Amount (₹)</label>
+                <input type="number" id="fdAmount" placeholder="100000">
+            </div>
+            <div class="input-group">
+                <label>Interest Rate (% per annum)</label>
+                <input type="number" id="fdRate" step="0.1" placeholder="6.5">
+            </div>
+            <div class="input-group">
+                <label>Time Period (months)</label>
+                <input type="number" id="fdPeriod" placeholder="12">
+            </div>
+            <div class="input-group">
+                <label>Compounding Frequency</label>
+                <select id="fdFreq">
+                    <option value="4">Quarterly</option>
+                    <option value="12">Monthly</option>
+                    <option value="1">Annually</option>
+                </select>
+            </div>
+            <button class="btn" onclick="calculateFD()">Calculate FD</button>
+            <div id="fdResult"></div>
+        </div>
+    </div>
+
+    <div id="rdCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('rdCalc')">×</button>
+            <h2>Recurring Deposit Calculator</h2>
+            <div class="input-group">
+                <label>Monthly Deposit (₹)</label>
+                <input type="number" id="rdAmount" placeholder="5000">
+            </div>
+            <div class="input-group">
+                <label>Interest Rate (% per annum)</label>
+                <input type="number" id="rdRate" step="0.1" placeholder="6.5">
+            </div>
+            <div class="input-group">
+                <label>Time Period (months)</label>
+                <input type="number" id="rdPeriod" placeholder="12">
+            </div>
+            <button class="btn" onclick="calculateRD()">Calculate RD</button>
+            <div id="rdResult"></div>
+        </div>
+    </div>
+
+    <div id="fdRdComparator" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('fdRdComparator')">×</button>
+            <h2>FD/RD Rate Comparator</h2>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">Compare returns from different banks</p>
+            <div class="input-group">
+                <label>Investment Amount (₹)</label>
+                <input type="number" id="compareAmount" placeholder="100000">
+            </div>
+            <div class="input-group">
+                <label>Time Period (months)</label>
+                <input type="number" id="comparePeriod" placeholder="12">
+            </div>
+            <div class="grid-two">
+                <div class="loan-section">
+                    <h3>Bank 1</h3>
+                    <div class="input-group">
+                        <label>Interest Rate (%)</label>
+                        <input type="number" id="bank1Rate" step="0.1" placeholder="6.5">
+                    </div>
+                </div>
+                <div class="loan-section">
+                    <h3>Bank 2</h3>
+                    <div class="input-group">
+                        <label>Interest Rate (%)</label>
+                        <input type="number" id="bank2Rate" step="0.1" placeholder="7.0">
+                    </div>
+                </div>
+            </div>
+            <button class="btn" onclick="compareFDRD()">Compare Returns</button>
+            <div id="compareResult"></div>
+        </div>
+    </div>
+
+    <div id="sipLumpsum" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('sipLumpsum')">×</button>
+            <h2>SIP vs Lump Sum Comparison</h2>
+            <div class="input-group">
+                <label>Investment Amount (₹)</label>
+                <input type="number" id="sipAmount" placeholder="10000">
+            </div>
+            <div class="input-group">
+                <label>Expected Annual Return (%)</label>
+                <input type="number" id="sipReturn" step="0.1" placeholder="12">
+            </div>
+            <div class="input-group">
+                <label>Investment Period (Years)</label>
+                <input type="number" id="sipYears" placeholder="10">
+            </div>
+            <button class="btn" onclick="calculateSIPvsLumpsum()">Compare</button>
+            <div id="sipResult"></div>
+        </div>
+    </div>
+
+    <div id="gstCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('gstCalc')">×</button>
+            <h2>GST Calculator</h2>
+            <div class="input-group">
+                <label>Amount (₹)</label>
+                <input type="number" id="gstAmount" placeholder="10000">
+            </div>
+            <div class="input-group">
+                <label>GST Rate (%)</label>
+                <select id="gstRate">
+                    <option value="5">5%</option>
+                    <option value="12">12%</option>
+                    <option value="18">18%</option>
+                    <option value="28">28%</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="input-group" id="customGstGroup" style="display:none;">
+                <label>Custom GST Rate (%)</label>
+                <input type="number" id="customGst" step="0.1" placeholder="Enter custom rate">
+            </div>
+            <div class="input-group">
+                <label>Calculate</label>
+                <select id="gstType">
+                    <option value="exclusive">Add GST (Exclusive)</option>
+                    <option value="inclusive">Remove GST (Inclusive)</option>
+                </select>
+            </div>
+            <button class="btn" onclick="calculateGST()">Calculate</button>
+            <div id="gstResult"></div>
+        </div>
+    </div>
+
+    <div id="reverseGst" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('reverseGst')">×</button>
+            <h2>Reverse GST Calculator</h2>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">Extract base price from GST-inclusive amount</p>
+            <div class="input-group">
+                <label>Final Price (with GST) (₹)</label>
+                <input type="number" id="reverseGstAmount" placeholder="11800">
+            </div>
+            <div class="input-group">
+                <label>GST Rate (%)</label>
+                <select id="reverseGstRate">
+                    <option value="5">5%</option>
+                    <option value="12">12%</option>
+                    <option value="18">18%</option>
+                    <option value="28">28%</option>
+                </select>
+            </div>
+            <button class="btn" onclick="calculateReverseGST()">Calculate Base Price</button>
+            <div id="reverseGstResult"></div>
+        </div>
+    </div>
+
+    <div id="aprCalculator" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('aprCalculator')">×</button>
+            <h2>Effective Interest Rate (APR) Calculator</h2>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">Calculate true annual percentage rate including all fees</p>
+            <div class="input-group">
+                <label>Loan Amount (₹)</label>
+                <input type="number" id="aprLoan" placeholder="500000">
+            </div>
+            <div class="input-group">
+                <label>Stated Interest Rate (%)</label>
+                <input type="number" id="aprRate" step="0.1" placeholder="10">
+            </div>
+            <div class="input-group">
+                <label>Loan Tenure (months)</label>
+                <input type="number" id="aprTenure" placeholder="60">
+            </div>
+            <div class="input-group">
+                <label>Processing Fee (₹)</label>
+                <input type="number" id="processingFee" placeholder="10000" value="0">
+            </div>
+            <div class="input-group">
+                <label>Other Charges (₹)</label>
+                <input type="number" id="otherCharges" placeholder="5000" value="0">
+            </div>
+            <button class="btn" onclick="calculateAPR()">Calculate APR</button>
+            <div id="aprResult"></div>
+        </div>
+    </div>
+
+    <div id="rentVsBuy" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('rentVsBuy')">×</button>
+            <h2>Rent vs Buy Analyzer</h2>
+            <div class="grid-two">
+                <div class="loan-section">
+                    <h3>Buying</h3>
+                    <div class="input-group">
+                        <label>Property Price (₹)</label>
+                        <input type="number" id="propertyPrice" placeholder="5000000">
+                    </div>
+                    <div class="input-group">
+                        <label>Down Payment (₹)</label>
+                        <input type="number" id="downPayment" placeholder="1000000">
+                    </div>
+                    <div class="input-group">
+                        <label>Loan Interest Rate (%)</label>
+                        <input type="number" id="loanRate" step="0.1" placeholder="8.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Loan Tenure (years)</label>
+                        <input type="number" id="loanTenure" placeholder="20">
+                    </div>
+                    <div class="input-group">
+                        <label>Annual Property Tax (₹)</label>
+                        <input type="number" id="propertyTax" placeholder="20000">
+                    </div>
+                    <div class="input-group">
+                        <label>Annual Maintenance (₹)</label>
+                        <input type="number" id="maintenance" placeholder="50000">
+                    </div>
+                </div>
+                <div class="loan-section">
+                    <h3>Renting</h3>
+                    <div class="input-group">
+                        <label>Monthly Rent (₹)</label>
+                        <input type="number" id="monthlyRent" placeholder="25000">
+                    </div>
+                    <div class="input-group">
+                        <label>Annual Rent Increase (%)</label>
+                        <input type="number" id="rentIncrease" step="0.1" placeholder="5" value="5">
+                    </div>
+                    <div class="input-group">
+                        <label>Investment Return on Down Payment (%)</label>
+                        <input type="number" id="investmentReturn" step="0.1" placeholder="12" value="12">
+                    </div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Analysis Period (years)</label>
+                <input type="number" id="analysisPeriod" placeholder="10">
+            </div>
+            <button class="btn" onclick="calculateRentVsBuy()">Analyze</button>
+            <div id="rentVsBuyResult"></div>
+        </div>
+    </div>
+
+    <div id="walletFeeCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('walletFeeCalc')">×</button>
+            <h2>Digital Wallet Fee Calculator</h2>
+            <div class="input-group">
+                <label>Transaction Amount (₹)</label>
+                <input type="number" id="walletAmount" placeholder="10000">
+            </div>
+            <button class="btn" onclick="calculateWalletFees()">Calculate Fees</button>
+            <div id="walletFeeResult"></div>
+        </div>
+    </div>
+
     <div id="cashCounter" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('cashCounter')">×</button>
@@ -41,7 +1358,53 @@
                     <input type="number" id="coin2" value="0" onchange="calculateCash()">
                 </div>
                 <div class="input-group">
-                    <label>₹1 Coins</label>
+                    <label>₹1LEC (₹)</label>
+                <input type="number" id="homeLoanInterest" placeholder="200000" value="0">
+            </div>
+            <button class="btn" onclick="calculateNetWorth()">Calculate Net Worth</button>
+            <div id="netWorthResult"></div>
+        </div>
+    </div>
+
+    <div id="fdCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('fdCalc')">×</button>
+            <h2>Fixed Deposit Calculator</h2>
+            <div class="input-group">
+                <label>Deposit Amount (₹)</label>
+                <input type="number" id="fdAmount" placeholder="100000">
+            </div>
+            <div class="input-group">
+                <label>Interest Rate (% per annum)</label>
+                <input type="number" id="fdRate" step="0.1" placeholder="6.5">
+            </div>
+            <div class="input-group">
+                <label>Time Period (months)</label>
+                <input type="number" id="fdPeriod" placeholder="12">
+            </div>
+            <div class="input-group">
+                <label>Compounding Frequency</label>
+                <select id="fdFreq">
+                    <option value="4">Quarterly</option>
+                    <option value="12">Monthly</option>
+                    <option value="1">Annually</option>
+                </select>
+            </div>
+            <button class="btn" onclick="calculateFD()">Calculate FD</button>
+            <div id="fdResult"></div>
+        </div>
+    </div>
+
+    <div id="rdCalc" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('rdCalc')">×</button>
+            <h2>Recurring Deposit Calculator</h2>
+            <div class="input-group">
+                <label>Monthly Deposit (₹)</label>
+                <input type="number" id="rdAmount" placeholder="5000">
+            </div>
+            <div class="input-group">
+Obins</label>
                     <input type="number" id="coin1" value="0" onchange="calculateCash()">
                 </div>
             </div>
@@ -49,7 +1412,6 @@
         </div>
     </div>
 
-    <!-- Amount to Words Modal -->
     <div id="amountToWord" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('amountToWord')">×</button>
@@ -63,7 +1425,6 @@
         </div>
     </div>
 
-    <!-- Currency Conversion Modal -->
     <div id="currencyConv" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('currencyConv')">×</button>
@@ -1122,6 +2483,33 @@
             return words.trim() + ' Rupees Only';
         }
 
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.querySelector('.theme-icon');
+        const themeText = document.querySelector('.theme-text');
+        
+        // Check for saved theme preference or default to dark mode
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.body.classList.toggle('light-mode', currentTheme === 'light');
+        updateThemeButton(currentTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLightMode = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+            updateThemeButton(isLightMode ? 'light' : 'dark');
+        });
+        
+        function updateThemeButton(theme) {
+            if (theme === 'light') {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+            }
+        }
+
         // Currency Converter
         const exchangeRates = {
             INR: 1,
@@ -1169,1175 +2557,4 @@
         }
     </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Calculator Hub</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            min-height: 100vh;
-            padding: 20px;
-            color: #fff;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 60px;
-            padding: 40px 20px;
-            animation: slideIn 0.8s ease-out;
-        }
-
-        header h1 {
-            font-size: 3.5em;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 15px;
-            letter-spacing: -2px;
-        }
-
-        header p {
-            font-size: 1.2em;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        .calc-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-
-        .calc-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-            animation: slideIn 0.6s ease-out backwards;
-        }
-
-        .calc-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .calc-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3), 0 0 40px rgba(139, 92, 246, 0.2);
-        }
-
-        .calc-card:hover::before {
-            opacity: 1;
-        }
-
-        .calc-card h3 {
-            color: #fff;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-            z-index: 1;
-            font-weight: 700;
-        }
-
-        .calc-card p {
-            color: rgba(255, 255, 255, 0.6);
-            position: relative;
-            z-index: 1;
-            line-height: 1.6;
-        }
-
-        .icon-wrapper {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-            transition: all 0.3s;
-        }
-
-        .calc-card:hover .icon-wrapper {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6);
-        }
-
-        .section-title {
-            color: #fff;
-            font-size: 2em;
-            margin: 60px 0 30px 0;
-            padding-left: 20px;
-            border-left: 4px solid;
-            border-image: linear-gradient(to bottom, #667eea, #764ba2) 1;
-            font-weight: 700;
-            letter-spacing: -1px;
-            position: relative;
-            animation: slideIn 0.6s ease-out;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            max-width: 900px;
-            margin: 20px auto;
-            border-radius: 25px;
-            padding: 40px;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content h2 {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 2em;
-            margin-bottom: 30px;
-            font-weight: 800;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 32px;
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.6);
-            background: none;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .close-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(90deg);
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 10px;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 600;
-            font-size: 0.95em;
-            letter-spacing: 0.5px;
-        }
-
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            font-size: 16px;
-            color: #fff;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-
-        .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .input-group input:focus, .input-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 35px;
-            border: none;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
-        }
-
-        .result-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(99, 102, 241, 0.3);
-            padding: 25px;
-            margin-top: 25px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .result-box h4 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.3em;
-            font-weight: 700;
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .result-item:last-child {
-            border-bottom: none;
-        }
-
-        .result-label {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .result-value {
-            font-weight: 700;
-            color: #fff;
-            font-size: 1.1em;
-        }
-
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .grid-two {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .loan-section {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table th, table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 700;
-        }
-
-        .highlight-box {
-            margin-top: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
-            border-left: 4px solid #4caf50;
-            border-radius: 12px;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .note-box {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255, 193, 7, 0.1);
-            border-left: 4px solid #ffc107;
-            border-radius: 8px;
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* SVG Icons */
-        .icon-svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        @media (max-width: 768px) {
-            .two-col, .grid-two {
-                grid-template-columns: 1fr;
-            }
-            header h1 {
-                font-size: 2.5em;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>FINANCIAL CALCULATOR HUB</h1>
-            <p>Advanced Financial Intelligence & Analysis Platform</p>
-        </header>
-
-        <h2 class="section-title">EMI CALCULATORS</h2>
-        <div class="calc-grid">
-            <div class="calc-card" onclick="openModal('emiCalc')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                    </div>
-                    EMI Calculator
-                </h3>
-                <p>Calculate your monthly loan EMI with precision and detailed breakdown</p>
-            </div>
-            <div class="calc-card" onclick="openModal('quickCalc')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
-                    </div>
-                    Quick Calculator
-                </h3>
-                <p>Lightning-fast EMI calculation with simplified inputs</p>
-            </div>
-            <div class="calc-card" onclick="openModal('advanceEmi')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
-                    </div>
-                    Advanced EMI
-                </h3>
-                <p>Comprehensive EMI analysis with prepayment optimization</p>
-            </div>
-            <div class="calc-card" onclick="openModal('compareLoans')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
-                    </div>
-                    Compare Loans
-                </h3>
-                <p>Intelligent comparison of multiple loan options</p>
-            </div>
-        </div>
-
-        <h2 class="section-title">SCENARIO & GOAL-BASED CALCULATORS</h2>
-        <div class="calc-grid">
-            <div class="calc-card" onclick="openModal('retirementCalc')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                    </div>
-                    Retirement Planner
-                </h3>
-                <p>Plan your retirement with inflation-adjusted calculations</p>
-            </div>
-            <div class="calc-card" onclick="openModal('prepaySimulator')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-                    </div>
-                    Cash Note Counter
-                </h3>
-                <p>Count and organize cash across all denominations</p>
-            </div>
-            <div class="calc-card" onclick="openModal('amountToWord')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                    </div>
-                    Amount to Words
-                </h3>
-                <p>Convert numerical amounts to word format</p>
-            </div>
-            <div class="calc-card" onclick="openModal('currencyConv')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12.89 11.1c-1.78-.59-2.64-.96-2.64-1.9 0-1.02 1.11-1.39 1.81-1.39 1.31 0 1.79.99 1.9 1.34l1.58-.67c-.15-.45-.82-1.92-2.54-2.24V5h-2v1.26c-2.48.56-2.49 2.86-2.49 2.96 0 2.27 2.25 2.91 3.35 3.31 1.58.56 2.28 1.07 2.28 2.03 0 1.13-1.05 1.61-1.98 1.61-1.82 0-2.34-1.87-2.4-2.09l-1.66.67c.63 2.19 2.28 2.78 2.9 2.96V19h2v-1.24c.4-.09 2.9-.59 2.9-3.22 0-1.39-.61-2.61-3.01-3.44zM3 21H1v-6h6v2l-2.48-.01c1.61 2.41 4.36 4.01 7.48 4.01 2.84 0 5.46-1.31 7.16-3.39l1.63 1.17c-2.02 2.48-5.09 3.98-8.79 3.98-4.39 0-8.22-2.55-10-6.3L3 18v3z"/></svg>
-                    </div>
-                    Currency Conversion
-                </h3>
-                <p>Real-time currency exchange calculations</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- All Calculator Modals -->
-    
-    <!-- EMI Calculator Modal -->
-    <div id="emiCalc" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('emiCalc')">×</button>
-            <h2>EMI Calculator</h2>
-            <div class="input-group">
-                <label>Loan Amount (₹)</label>
-                <input type="number" id="emiLoan" placeholder="Enter loan amount">
-            </div>
-            <div class="input-group">
-                <label>Interest Rate (% per annum)</label>
-                <input type="number" id="emiRate" step="0.1" placeholder="Enter interest rate">
-            </div>
-            <div class="input-group">
-                <label>Loan Tenure (months)</label>
-                <input type="number" id="emiTenure" placeholder="Enter tenure in months">
-            </div>
-            <button class="btn" onclick="calculateEMI()">Calculate EMI</button>
-            <div id="emiResult"></div>
-        </div>
-    </div>
-
-    <!-- Quick Calculator Modal -->
-    <div id="quickCalc" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('quickCalc')">×</button>
-            <h2>Quick Calculator</h2>
-            <div class="input-group">
-                <label>Loan Amount (₹)</label>
-                <input type="number" id="quickLoan" placeholder="500000">
-            </div>
-            <div class="input-group">
-                <label>Interest Rate (%)</label>
-                <input type="number" id="quickRate" step="0.1" placeholder="10.5">
-            </div>
-            <div class="input-group">
-                <label>Tenure (Years)</label>
-                <input type="number" id="quickYears" placeholder="5">
-            </div>
-            <button class="btn" onclick="calculateQuick()">Calculate</button>
-            <div id="quickResult"></div>
-        </div>
-    </div>
-
-    <!-- Advanced EMI Modal -->
-    <div id="advanceEmi" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('advanceEmi')">×</button>
-            <h2>Advanced EMI Calculator</h2>
-            <div class="input-group">
-                <label>Loan Amount (₹)</label>
-                <input type="number" id="advLoan" placeholder="Enter loan amount">
-            </div>
-            <div class="input-group">
-                <label>Interest Rate (% per annum)</label>
-                <input type="number" id="advRate" step="0.1" placeholder="Enter interest rate">
-            </div>
-            <div class="input-group">
-                <label>Loan Tenure (months)</label>
-                <input type="number" id="advTenure" placeholder="Enter tenure">
-            </div>
-            <div class="input-group">
-                <label>Prepayment Amount (₹) - Optional</label>
-                <input type="number" id="advPrepay" placeholder="Enter prepayment amount">
-            </div>
-            <div class="input-group">
-                <label>Prepayment After (months) - Optional</label>
-                <input type="number" id="advPrepayMonth" placeholder="After how many months?">
-            </div>
-            <button class="btn" onclick="calculateAdvanced()">Calculate</button>
-            <div id="advResult"></div>
-        </div>
-    </div>
-
-    <!-- Compare Loans Modal -->
-    <div id="compareLoans" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('compareLoans')">×</button>
-            <h2>Compare Loans</h2>
-            <div class="grid-two">
-                <div class="loan-section">
-                    <h3>Loan Option 1</h3>
-                    <div class="input-group">
-                        <label>Loan Amount (₹)</label>
-                        <input type="number" id="cmp1Loan" placeholder="1000000">
-                    </div>
-                    <div class="input-group">
-                        <label>Interest Rate (%)</label>
-                        <input type="number" id="cmp1Rate" step="0.1" placeholder="9.5">
-                    </div>
-                    <div class="input-group">
-                        <label>Tenure (months)</label>
-                        <input type="number" id="cmp1Tenure" placeholder="60">
-                    </div>
-                </div>
-                <div class="loan-section">
-                    <h3>Loan Option 2</h3>
-                    <div class="input-group">
-                        <label>Loan Amount (₹)</label>
-                        <input type="number" id="cmp2Loan" placeholder="1000000">
-                    </div>
-                    <div class="input-group">
-                        <label>Interest Rate (%)</label>
-                        <input type="number" id="cmp2Rate" step="0.1" placeholder="10.5">
-                    </div>
-                    <div class="input-group">
-                        <label>Tenure (months)</label>
-                        <input type="number" id="cmp2Tenure" placeholder="60">
-                    </div>
-                </div>
-            </div>
-            <button class="btn" onclick="compareLoans()">Compare</button>
-            <div id="compareResult"></div>
-        </div>
-    </div>
-
-    <!-- Retirement Planner Modal -->
-    <div id="retirementCalc" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('retirementCalc')">×</button>
-            <h2>Retirement Planner</h2>
-            <div class="input-group">
-                <label>Current Age</label>
-                <input type="number" id="currentAge" placeholder="30">
-            </div>
-            <div class="input-group">
-                <label>Desired Retirement Age</label>
-                <input type="number" id="retirementAge" placeholder="60">
-            </div>
-            <div class="input-group">
-                <label>Life Expectancy</label>
-                <input type="number" id="lifeExpectancy" placeholder="85">
-            </div>
-            <div class="input-group">
-                <label>Current Monthly Expenses (₹)</label>
-                <input type="number" id="monthlyExpenses" placeholder="50000">
-            </div>
-            <div class="input-group">
-                <label>Current Savings (₹)</label>
-                <input type="number" id="currentSavings" placeholder="500000">
-            </div>
-            <div class="input-group">
-                <label>Expected Inflation Rate (%)</label>
-                <input type="number" id="inflationRate" step="0.1" placeholder="6" value="6">
-            </div>
-            <div class="input-group">
-                <label>Expected Return on Investment (%)</label>
-                <input type="number" id="returnRate" step="0.1" placeholder="12" value="12">
-            </div>
-            <button class="btn" onclick="calculateRetirement()">Calculate Retirement Plan</button>
-            <div id="retirementResult"></div>
-        </div>
-    </div>
-
-    <!-- Prepayment Simulator Modal -->
-    <div id="prepaySimulator" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('prepaySimulator')">×</button>
-            <h2>Loan Prepayment Simulator</h2>
-            <div class="input-group">
-                <label>Loan Amount (₹)</label>
-                <input type="number" id="prepayLoan" placeholder="2000000">
-            </div>
-            <div class="input-group">
-                <label>Interest Rate (% per annum)</label>
-                <input type="number" id="prepayRate" step="0.1" placeholder="9.5">
-            </div>
-            <div class="input-group">
-                <label>Loan Tenure (months)</label>
-                <input type="number" id="prepayTenure" placeholder="240">
-            </div>
-            <div class="input-group">
-                <label>Prepayment Amount (₹)</label>
-                <input type="number" id="prepayAmount" placeholder="100000">
-            </div>
-            <div class="input-group">
-                <label>Prepayment After (months)</label>
-                <input type="number" id="prepayAfter" placeholder="12">
-            </div>
-            <div class="input-group">
-                <label>Prepayment Type</label>
-                <select id="prepayType">
-                    <option value="reduce_tenure">Reduce Tenure</option>
-                    <option value="reduce_emi">Reduce EMI</option>
-                </select>
-            </div>
-            <button class="btn" onclick="calculatePrepayment()">Calculate Savings</button>
-            <div id="prepayResult"></div>
-        </div>
-    </div>
-
-    <!-- Tax Optimizer Modal -->
-    <div id="taxOptimizer" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('taxOptimizer')">×</button>
-            <h2>Income Tax Optimizer</h2>
-            <div class="input-group">
-                <label>Annual Income (₹)</label>
-                <input type="number" id="annualIncome" placeholder="1200000">
-            </div>
-            <div class="input-group">
-                <label>Tax Regime</label>
-                <select id="taxRegime">
-                    <option value="old">Old Tax Regime</option>
-                    <option value="new">New Tax Regime</option>
-                </select>
-            </div>
-            <div id="oldRegimeDeductions" style="display:block;">
-                <div class="input-group">
-                    <label>Section 80C Deductions (₹)</label>
-                    <input type="number" id="deduction80C" placeholder="150000" value="0">
-                </div>
-                <div class="input-group">
-                    <label>Section 80D (Medical Insurance) (₹)</label>
-                    <input type="number" id="deduction80D" placeholder="25000" value="0">
-                </div>
-                <div class="input-group">
-                    <label>Home Loan Interest (₹)</label>
-                    <input type="number" id="homeLoanInterest" placeholder="200000" value="0">
-                </div>
-            </div>
-            <button class="btn" onclick="calculateTax()">Calculate Tax</button>
-            <div id="taxResult"></div>
-        </div>
-    </div>
-
-    <!-- Net Worth Tracker Modal -->
-    <div id="netWorthTracker" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('netWorthTracker')">×</button>
-            <h2>Net Worth Tracker</h2>
-            <h3 style="color: #4caf50; margin-top: 20px;">Assets</h3>
-            <div class="input-group">
-                <label>Cash & Bank Balance (₹)</label>
-                <input type="number" id="cashBalance" placeholder="500000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Investments (Stocks, MFs, etc.) (₹)</label>
-                <input type="number" id="investments" placeholder="1000000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Real Estate Value (₹)</label>
-                <input type="number" id="realEstate" placeholder="5000000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Vehicles (₹)</label>
-                <input type="number" id="vehicles" placeholder="800000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Other Assets (₹)</label>
-                <input type="number" id="otherAssets" placeholder="200000" value="0">
-            </div>
-            
-            <h3 style="color: #f44336; margin-top: 30px;">Liabilities</h3>
-            <div class="input-group">
-                <label>Home Loan (₹)</label>
-                <input type="number" id="homeLoan" placeholder="3000000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Car Loan (₹)</label>
-                <input type="number" id="carLoan" placeholder="500000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Personal Loan (₹)</label>
-                <input type="number" id="personalLoan" placeholder="200000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Credit Card Debt (₹)</label>
-                <input type="number" id="creditCardDebt" placeholder="50000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Other Liabilities (₹)</label>
-                <input type="number" id="otherLiabilities" placeholder="0" value="0">
-            </div>
-            <button class="btn" onclick="calculateNetWorth()">Calculate Net Worth</button>
-            <div id="netWorthResult"></div>
-        </div>
-    </div>
-
-    <!-- FD Calculator Modal -->
-    <div id="fdCalc" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('fdCalc')">×</button>
-            <h2>Fixed Deposit Calculator</h2>
-            <div class="input-group">
-                <label>Deposit Amount (₹)</label>
-                <input type="number" id="fdAmount" placeholder="100000">
-            </div>
-            <div class="input-group">
-                <label>Interest Rate (% per annum)</label>
-                <input type="number" id="fdRate" step="0.1" placeholder="6.5">
-            </div>
-            <div class="input-group">
-                <label>Time Period (months)</label>
-                <input type="number" id="fdPeriod" placeholder="12">
-            </div>
-            <div class="input-group">
-                <label>Compounding Frequency</label>
-                <select id="fdFreq">
-                    <option value="4">Quarterly</option>
-                    <option value="12">Monthly</option>
-                    <option value="1">Annually</option>
-                </select>
-            </div>
-            <button class="btn" onclick="calculateFD()">Calculate FD</button>
-            <div id="fdResult"></div>
-        </div>
-    </div>
-
-    <!-- RD Calculator Modal -->
-    <div id="rdCalc" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('rdCalc')">×</button>
-            <h2>Recurring Deposit Calculator</h2>
-            <div class="input-group">
-                <label>Monthly Deposit (₹)</label>
-                <input type="number" id="rdAmount" placeholder="5000">
-            </div>
-            <div class="input-group">
-                <label>Interest Rate (% per annum)</label>
-                <input type="number" id="rdRate" step="0.1" placeholder="6.5">
-            </div>
-            <div class="input-group">
-                <label>Time Period (months)</label>
-                <input type="number" id="rdPeriod" placeholder="12">
-            </div>
-            <button class="btn" onclick="calculateRD()">Calculate RD</button>
-            <div id="rdResult"></div>
-        </div>
-    </div>
-
-    <!-- FD/RD Comparator Modal -->
-    <div id="fdRdComparator" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('fdRdComparator')">×</button>
-            <h2>FD/RD Rate Comparator</h2>
-            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">Compare returns from different banks</p>
-            <div class="input-group">
-                <label>Investment Amount (₹)</label>
-                <input type="number" id="compareAmount" placeholder="100000">
-            </div>
-            <div class="input-group">
-                <label>Time Period (months)</label>
-                <input type="number" id="comparePeriod" placeholder="12">
-            </div>
-            <div class="grid-two">
-                <div class="loan-section">
-                    <h3>Bank 1</h3>
-                    <div class="input-group">
-                        <label>Interest Rate (%)</label>
-                        <input type="number" id="bank1Rate" step="0.1" placeholder="6.5">
-                    </div>
-                </div>
-                <div class="loan-section">
-                    <h3>Bank 2</h3>
-                    <div class="input-group">
-                        <label>Interest Rate (%)</label>
-                        <input type="number" id="bank2Rate" step="0.1" placeholder="7.0">
-                    </div>
-                </div>
-            </div>
-            <button class="btn" onclick="compareFDRD()">Compare Returns</button>
-            <div id="compareResult"></div>
-        </div>
-    </div>
-
-    <!-- SIP vs Lump Sum Modal -->
-    <div id="sipLumpsum" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('sipLumpsum')">×</button>
-            <h2>SIP vs Lump Sum Comparison</h2>
-            <div class="input-group">
-                <label>Investment Amount (₹)</label>
-                <input type="number" id="sipAmount" placeholder="10000">
-            </div>
-            <div class="input-group">
-                <label>Expected Annual Return (%)</label>
-                <input type="number" id="sipReturn" step="0.1" placeholder="12">
-            </div>
-            <div class="input-group">
-                <label>Investment Period (Years)</label>
-                <input type="number" id="sipYears" placeholder="10">
-            </div>
-            <button class="btn" onclick="calculateSIPvsLumpsum()">Compare</button>
-            <div id="sipResult"></div>
-        </div>
-    </div>
-
-    <!-- GST Calculator Modal -->
-    <div id="gstCalc" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('gstCalc')">×</button>
-            <h2>GST Calculator</h2>
-            <div class="input-group">
-                <label>Amount (₹)</label>
-                <input type="number" id="gstAmount" placeholder="10000">
-            </div>
-            <div class="input-group">
-                <label>GST Rate (%)</label>
-                <select id="gstRate">
-                    <option value="5">5%</option>
-                    <option value="12">12%</option>
-                    <option value="18">18%</option>
-                    <option value="28">28%</option>
-                    <option value="custom">Custom</option>
-                </select>
-            </div>
-            <div class="input-group" id="customGstGroup" style="display:none;">
-                <label>Custom GST Rate (%)</label>
-                <input type="number" id="customGst" step="0.1" placeholder="Enter custom rate">
-            </div>
-            <div class="input-group">
-                <label>Calculate</label>
-                <select id="gstType">
-                    <option value="exclusive">Add GST (Exclusive)</option>
-                    <option value="inclusive">Remove GST (Inclusive)</option>
-                </select>
-            </div>
-            <button class="btn" onclick="calculateGST()">Calculate</button>
-            <div id="gstResult"></div>
-        </div>
-    </div>
-
-    <!-- Reverse GST Modal -->
-    <div id="reverseGst" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('reverseGst')">×</button>
-            <h2>Reverse GST Calculator</h2>
-            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">Extract base price from GST-inclusive amount</p>
-            <div class="input-group">
-                <label>Final Price (with GST) (₹)</label>
-                <input type="number" id="reverseGstAmount" placeholder="11800">
-            </div>
-            <div class="input-group">
-                <label>GST Rate (%)</label>
-                <select id="reverseGstRate">
-                    <option value="5">5%</option>
-                    <option value="12">12%</option>
-                    <option value="18">18%</option>
-                    <option value="28">28%</option>
-                </select>
-            </div>
-            <button class="btn" onclick="calculateReverseGST()">Calculate Base Price</button>
-            <div id="reverseGstResult"></div>
-        </div>
-    </div>
-
-    <!-- APR Calculator Modal -->
-    <div id="aprCalculator" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('aprCalculator')">×</button>
-            <h2>Effective Interest Rate (APR) Calculator</h2>
-            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">Calculate true annual percentage rate including all fees</p>
-            <div class="input-group">
-                <label>Loan Amount (₹)</label>
-                <input type="number" id="aprLoan" placeholder="500000">
-            </div>
-            <div class="input-group">
-                <label>Stated Interest Rate (%)</label>
-                <input type="number" id="aprRate" step="0.1" placeholder="10">
-            </div>
-            <div class="input-group">
-                <label>Loan Tenure (months)</label>
-                <input type="number" id="aprTenure" placeholder="60">
-            </div>
-            <div class="input-group">
-                <label>Processing Fee (₹)</label>
-                <input type="number" id="processingFee" placeholder="10000" value="0">
-            </div>
-            <div class="input-group">
-                <label>Other Charges (₹)</label>
-                <input type="number" id="otherCharges" placeholder="5000" value="0">
-            </div>
-            <button class="btn" onclick="calculateAPR()">Calculate APR</button>
-            <div id="aprResult"></div>
-        </div>
-    </div>
-
-    <!-- Rent vs Buy Modal -->
-    <div id="rentVsBuy" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('rentVsBuy')">×</button>
-            <h2>Rent vs Buy Analyzer</h2>
-            <div class="grid-two">
-                <div class="loan-section">
-                    <h3>Buying</h3>
-                    <div class="input-group">
-                        <label>Property Price (₹)</label>
-                        <input type="number" id="propertyPrice" placeholder="5000000">
-                    </div>
-                    <div class="input-group">
-                        <label>Down Payment (₹)</label>
-                        <input type="number" id="downPayment" placeholder="1000000">
-                    </div>
-                    <div class="input-group">
-                        <label>Loan Interest Rate (%)</label>
-                        <input type="number" id="loanRate" step="0.1" placeholder="8.5">
-                    </div>
-                    <div class="input-group">
-                        <label>Loan Tenure (years)</label>
-                        <input type="number" id="loanTenure" placeholder="20">
-                    </div>
-                    <div class="input-group">
-                        <label>Annual Property Tax (₹)</label>
-                        <input type="number" id="propertyTax" placeholder="20000">
-                    </div>
-                    <div class="input-group">
-                        <label>Annual Maintenance (₹)</label>
-                        <input type="number" id="maintenance" placeholder="50000">
-                    </div>
-                </div>
-                <div class="loan-section">
-                    <h3>Renting</h3>
-                    <div class="input-group">
-                        <label>Monthly Rent (₹)</label>
-                        <input type="number" id="monthlyRent" placeholder="25000">
-                    </div>
-                    <div class="input-group">
-                        <label>Annual Rent Increase (%)</label>
-                        <input type="number" id="rentIncrease" step="0.1" placeholder="5" value="5">
-                    </div>
-                    <div class="input-group">
-                        <label>Investment Return on Down Payment (%)</label>
-                        <input type="number" id="investmentReturn" step="0.1" placeholder="12" value="12">
-                    </div>
-                </div>
-            </div>
-            <div class="input-group">
-                <label>Analysis Period (years)</label>
-                <input type="number" id="analysisPeriod" placeholder="10">
-            </div>
-            <button class="btn" onclick="calculateRentVsBuy()">Analyze</button>
-            <div id="rentVsBuyResult"></div>
-        </div>
-    </div>
-
-    <!-- Digital Wallet Fee Calculator Modal -->
-    <div id="walletFeeCalc" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('walletFeeCalc')">×</button>
-            <h2>Digital Wallet Fee Calculator</h2>
-            <div class="input-group">
-                <label>Transaction Amount (₹)</label>
-                <input type="number" id="walletAmount" placeholder="10000">
-            </div>
-            <button class="btn" onclick="calculateWalletFees()">Calculate Fees</button>
-            <div id="walletFeeResult"></div>
-        </div>
-    </div>
-
-    <!-- Cash Counter Modal -->
-    <div id="cashCounter" class="modal">
-        <div class="modal-content">
-            21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-                    </div>
-                    Loan Prepayment Simulator
-                </h3>
-                <p>See how much you save with prepayments</p>
-            </div>
-            <div class="calc-card" onclick="openModal('taxOptimizer')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                    </div>
-                    Income Tax Optimizer
-                </h3>
-                <p>Calculate tax and optimize with Section 80C deductions</p>
-            </div>
-            <div class="calc-card" onclick="openModal('netWorthTracker')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-                    </div>
-                    Net Worth Tracker
-                </h3>
-                <p>Track your assets vs liabilities for financial wellness</p>
-            </div>
-        </div>
-
-        <h2 class="section-title">BANKING CALCULATORS</h2>
-        <div class="calc-grid">
-            <div class="calc-card" onclick="openModal('fdCalc')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z"/></svg>
-                    </div>
-                    FD Calculator
-                </h3>
-                <p>Compute Fixed Deposit returns with compound interest</p>
-            </div>
-            <div class="calc-card" onclick="openModal('rdCalc')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-                    </div>
-                    RD Calculator
-                </h3>
-                <p>Calculate Recurring Deposit maturity amounts</p>
-            </div>
-            <div class="calc-card" onclick="openModal('fdRdComparator')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
-                    </div>
-                    FD/RD Rate Comparator
-                </h3>
-                <p>Compare rates from multiple banks</p>
-            </div>
-            <div class="calc-card" onclick="openModal('sipLumpsum')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
-                    </div>
-                    SIP vs Lump Sum
-                </h3>
-                <p>Compare systematic vs one-time investment returns</p>
-            </div>
-        </div>
-
-        <h2 class="section-title">GST & TAX CALCULATORS</h2>
-        <div class="calc-grid">
-            <div class="calc-card" onclick="openModal('gstCalc')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-1.5c0-2.33 4.67-3.5 7-3.5s7 1.17 7 3.5V19z"/></svg>
-                    </div>
-                    GST Calculator
-                </h3>
-                <p>Calculate GST with CGST/SGST breakdown</p>
-            </div>
-            <div class="calc-card" onclick="openModal('reverseGst')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
-                    </div>
-                    Reverse GST Calculator
-                </h3>
-                <p>Extract base price from GST-inclusive amount</p>
-            </div>
-            <div class="calc-card" onclick="openModal('aprCalculator')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-                    </div>
-                    Effective Interest Rate (APR)
-                </h3>
-                <p>Calculate true annual percentage rate with all fees</p>
-            </div>
-        </div>
-
-        <h2 class="section-title">BUSINESS & UTILITY CALCULATORS</h2>
-        <div class="calc-grid">
-            <div class="calc-card" onclick="openModal('rentVsBuy')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                    </div>
-                    Rent vs Buy Analyzer
-                </h3>
-                <p>Compare long-term costs of renting vs buying property</p>
-            </div>
-            <div class="calc-card" onclick="openModal('walletFeeCalc')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-                    </div>
-                    Digital Wallet Fee Calculator
-                </h3>
-                <p>Compare transaction fees across payment platforms</p>
-            </div>
-            <div class="calc-card" onclick="openModal('cashCounter')">
-                <h3>
-                    <div class="icon-wrapper">
-                        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.
+</html>
